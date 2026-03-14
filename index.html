@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 2: GUI Design with Images</title>
+    <!-- Required libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; }
+        body { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .card { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        h1 { color: #1e3c72; text-align: center; border-bottom: 3px solid #2a5298; padding-bottom: 10px; }
+        h2 { text-align: center; color: #2a5298; margin-bottom: 20px; font-size: 28px; }
+        .info-bar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 10px; margin: 20px 0; display: flex; justify-content: space-between; font-size: 18px; }
+        .task-header { background: #2a5298; color: white; padding: 20px; border-radius: 10px; margin: 20px 0; text-align: center; }
+        .task-header h2 { color: white; font-size: 32px; margin: 0 0 10px 0; }
+        .task-header p { font-size: 20px; opacity: 0.9; }
+        .form-group { margin-bottom: 25px; }
+        label { display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 18px; }
+        input, select, textarea { 
+            width: 100%; 
+            padding: 15px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 10px; 
+            font-size: 18px; 
+            transition: all 0.3s;
+            direction: ltr;
+        }
+        textarea { min-height: 120px; resize: vertical; font-size: 18px; }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42,82,152,0.1);
+        }
+        .btn { 
+            padding: 15px 30px; 
+            border: none; 
+            border-radius: 10px; 
+            font-size: 20px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            margin: 10px 0; 
+            transition: all 0.3s; 
+            width: 100%;
+        }
+        .btn-primary { background: #2a5298; color: white; }
+        .btn-primary:hover { background: #1e3c72; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(42,82,152,0.3); }
+        .btn-success { background: #28a745; color: white; }
+        .btn-success:hover { background: #218838; transform: translateY(-2px); }
+        .message { padding: 15px; border-radius: 8px; margin: 15px 0; display: none; font-size: 18px; }
+        .message.success { background: #d4edda; color: #155724; display: block; }
+        .message.warning { background: #fff3cd; color: #856404; display: block; }
+        .deadline { 
+            background: #fff3cd; 
+            border-left: 5px solid #856404; 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin: 20px 0; 
+            font-size: 18px;
+        }
+        .footer { 
+            margin-top: 40px; 
+            padding: 20px; 
+            background: #f8f9fa; 
+            border-radius: 10px; 
+            text-align: center; 
+            color: #666; 
+            border-top: 2px solid #2a5298;
+            font-size: 16px;
+        }
+        .copyright { color: #2a5298; font-weight: bold; font-size: 18px; }
+        .supervisor-field { 
+            background: #e3f2fd; 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin-bottom: 25px; 
+            border: 2px solid #2a5298; 
+        }
+        .supervisor-field label { font-size: 20px; color: #1e3c72; }
+        .supervisor-field input { 
+            font-size: 22px; 
+            background: #f0f0f0; 
+            font-weight: bold; 
+            color: #1e3c72; 
+            border: 2px solid #2a5298;
+            direction: ltr;
+        }
+        h3 { 
+            font-size: 24px; 
+            color: #1e3c72; 
+            margin: 25px 0 15px 0; 
+            border-left: 5px solid #2a5298; 
+            padding-left: 15px; 
+        }
+        .image-section {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #2a5298;
+        }
+        .image-item {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .image-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .image-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2a5298;
+        }
+        .image-number {
+            background: #2a5298;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 16px;
+        }
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .delete-btn:hover {
+            background: #c82333;
+        }
+        .image-preview {
+            max-width: 100%;
+            max-height: 200px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 5px;
+        }
+        .image-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .badge {
+            background: #2a5298;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>📋 Software Engineering - Task 2</h1>
+            
+            <div class="info-bar">
+                <span>📅 Submission: March 13 - 25, 2026</span>
+                <span>🏷️ Grade: 5 points</span>
+            </div>
+            
+            <div class="task-header">
+                <h2>GUI Design with Images</h2>
+                <p>Upload interface images with sequential numbering</p>
+            </div>
+            
+            <div class="deadline">
+                <strong>⏰ Important:</strong> Deadline: March 25, 2026, 11:55 PM
+                <br>📌 Submit a Word file containing all interface images with Figure numbers
+            </div>
+            
+            <div id="formMessage" class="message"></div>
+            
+            <!-- Supervisor field -->
+            <div class="supervisor-field">
+                <label>👩‍🏫 Supervisor</label>
+                <input type="text" id="supervisor" value="Dr. Sherin Hijazi" readonly>
+            </div>
+            
+            <!-- Group Information -->
+            <h3>👥 Group Information</h3>
+            
+            <div class="form-group">
+                <label>Group Number</label>
+                <input type="number" id="groupNumber" placeholder="Enter group number" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Student ID (registrar)</label>
+                <input type="text" id="studentId" placeholder="e.g., 202012345" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Student Full Name</label>
+                <input type="text" id="studentName" placeholder="Full name" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Section</label>
+                <select id="section" required>
+                    <option value="">Select section</option>
+                    <option value="1">Section 1</option>
+                    <option value="2">Section 2</option>
+                    <option value="3">Section 3</option>
+                </select>
+            </div>
+            
+            <!-- Image Upload Section -->
+            <h3>🖼️ Interface Images</h3>
+            <p style="font-size: 16px; color: #666; margin-bottom: 15px;">Upload your interface designs. Each image will be automatically numbered (Figure 1, Figure 2, etc.)</p>
+            
+            <div class="image-section">
+                <div id="imagesContainer"></div>
+                <button class="btn btn-success" onclick="addImageField()">➕ Add New Interface Image</button>
+            </div>
+            
+            <div class="form-group">
+                <label>Additional Notes</label>
+                <textarea id="notes" placeholder="Any additional notes about the design..."></textarea>
+            </div>
+            
+            <!-- Word file button -->
+            <button class="btn btn-primary" onclick="generateWordFile()">📄 Generate Word File with Images</button>
+            
+            <p style="text-align: center; margin: 20px 0; color: #666; font-size: 18px;">
+                ⭐ After clicking the button, the file will be downloaded. Upload it to Moodle.
+            </p>
+            
+            <!-- Copyright Footer -->
+            <div class="footer">
+                <p class="copyright">© 2026 Dr. Sherin Hijazi - All Rights Reserved</p>
+                <p>Developed by: Dr. Sherin Hijazi - Software Engineering Course Project Management System</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let imageCount = 0;
+
+        window.onload = function() {
+            // Add initial image fields
+            addImageField();
+            addImageField();
+        };
+
+        function addImageField() {
+            imageCount++;
+            const container = document.getElementById('imagesContainer');
+            const div = document.createElement('div');
+            div.className = 'image-item';
+            div.id = `image_${imageCount}`;
+            
+            div.innerHTML = `
+                <div class="image-header">
+                    <span class="image-number">Figure ${imageCount}</span>
+                    <span class="image-title">Interface Image ${imageCount}</span>
+                    <button class="delete-btn" onclick="removeImage(${imageCount})">Delete</button>
+                </div>
+                <div class="form-group">
+                    <label>Image Title / Name</label>
+                    <input type="text" id="image_${imageCount}_title" placeholder="e.g., Login Screen, Main Dashboard, etc.">
+                </div>
+                <div class="form-group">
+                    <label>Upload Image (PNG, JPG, GIF)</label>
+                    <input type="file" id="image_${imageCount}_file" accept="image/*" onchange="previewImage(this, ${imageCount})">
+                </div>
+                <div class="form-group">
+                    <label>Image Description</label>
+                    <textarea id="image_${imageCount}_desc" placeholder="Describe what this interface shows..." rows="3"></textarea>
+                </div>
+                <div id="image_${imageCount}_preview" style="text-align: center;"></div>
+            `;
+            container.appendChild(div);
+        }
+
+        function previewImage(input, imageId) {
+            const previewDiv = document.getElementById(`image_${imageId}_preview`);
+            previewDiv.innerHTML = '';
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'image-preview';
+                    img.style.maxWidth = '100%';
+                    img.style.maxHeight = '200px';
+                    previewDiv.appendChild(img);
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function removeImage(id) {
+            const element = document.getElementById(`image_${id}`);
+            if (element) {
+                element.remove();
+                // Renumber remaining images
+                renumberImages();
+            }
+        }
+
+        function renumberImages() {
+            const images = document.querySelectorAll('.image-item');
+            imageCount = images.length;
+            
+            images.forEach((img, index) => {
+                const newNumber = index + 1;
+                const header = img.querySelector('.image-header');
+                const numberSpan = header.querySelector('.image-number');
+                const titleSpan = header.querySelector('.image-title');
+                
+                numberSpan.textContent = `Figure ${newNumber}`;
+                titleSpan.textContent = `Interface Image ${newNumber}`;
+                
+                // Update IDs of child elements
+                const oldId = img.id.split('_')[1];
+                const newId = newNumber;
+                
+                img.id = `image_${newId}`;
+                
+                const titleInput = img.querySelector(`#image_${oldId}_title`);
+                if (titleInput) titleInput.id = `image_${newId}_title`;
+                
+                const fileInput = img.querySelector(`#image_${oldId}_file`);
+                if (fileInput) fileInput.id = `image_${newId}_file`;
+                
+                const descTextarea = img.querySelector(`#image_${oldId}_desc`);
+                if (descTextarea) descTextarea.id = `image_${newId}_desc`;
+                
+                const previewDiv = img.querySelector(`#image_${oldId}_preview`);
+                if (previewDiv) previewDiv.id = `image_${newId}_preview`;
+            });
+        }
+
+        function getFormData() {
+            const groupNumber = document.getElementById('groupNumber').value;
+            const studentId = document.getElementById('studentId').value.trim();
+            const studentName = document.getElementById('studentName').value.trim();
+            const section = document.getElementById('section').value;
+            const supervisor = document.getElementById('supervisor').value;
+
+            if (!groupNumber || !studentId || !studentName || !section) {
+                showMessage('Please complete group information first', 'warning');
+                return null;
+            }
+
+            // Collect image data
+            const images = [];
+            for (let i = 1; i <= imageCount; i++) {
+                const titleEl = document.getElementById(`image_${i}_title`);
+                const fileEl = document.getElementById(`image_${i}_file`);
+                const descEl = document.getElementById(`image_${i}_desc`);
+                
+                if (fileEl && fileEl.files && fileEl.files[0]) {
+                    images.push({
+                        number: i,
+                        title: titleEl ? titleEl.value.trim() : `Interface ${i}`,
+                        description: descEl ? descEl.value.trim() : '',
+                        file: fileEl.files[0]
+                    });
+                }
+            }
+
+            if (images.length === 0) {
+                showMessage('Upload at least one image', 'warning');
+                return null;
+            }
+
+            return {
+                groupNumber,
+                studentId,
+                studentName,
+                section,
+                supervisor,
+                images,
+                notes: document.getElementById('notes').value.trim(),
+                date: new Date().toLocaleString('en-US')
+            };
+        }
+
+        // 📄 Generate Word File with Images
+        async function generateWordFile() {
+            const data = getFormData();
+            if (!data) return;
+
+            showLoading(true);
+
+            try {
+                // Create HTML content for submission
+                let htmlContent = `
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>Task 2 - GUI Design with Images</title>
+                        <style>
+                            body { 
+                                font-family: 'Arial', 'Times New Roman', sans-serif; 
+                                padding: 30px; 
+                                direction: ltr;
+                                line-height: 1.8;
+                                max-width: 1200px;
+                                margin: 0 auto;
+                            }
+                            h1 { 
+                                color: #2a5298; 
+                                text-align: center; 
+                                font-size: 32px;
+                                margin-bottom: 20px;
+                                border-bottom: 3px solid #2a5298;
+                                padding-bottom: 15px;
+                            }
+                            h2 { 
+                                color: #1e3c72; 
+                                font-size: 28px;
+                                margin: 25px 0 15px 0;
+                            }
+                            h3 {
+                                color: #2a5298;
+                                font-size: 24px;
+                                margin: 20px 0 10px 0;
+                                border-left: 5px solid #2a5298;
+                                padding-left: 15px;
+                            }
+                            .info-box { 
+                                background: #f0f8ff; 
+                                padding: 20px; 
+                                border-radius: 10px; 
+                                margin: 20px 0; 
+                                border: 2px solid #2a5298;
+                                font-size: 18px;
+                            }
+                            .info-box p {
+                                margin: 10px 0;
+                                font-size: 18px;
+                            }
+                            .image-box { 
+                                border: 2px solid #2a5298; 
+                                padding: 20px; 
+                                margin: 25px 0; 
+                                border-radius: 10px; 
+                                background: #ffffff;
+                                page-break-inside: avoid;
+                            }
+                            .figure-title {
+                                color: #2a5298;
+                                font-size: 20px;
+                                font-weight: bold;
+                                margin-bottom: 15px;
+                                padding-bottom: 5px;
+                                border-bottom: 1px solid #2a5298;
+                            }
+                            .image-container {
+                                text-align: center;
+                                margin: 20px 0;
+                            }
+                            .image-container img {
+                                max-width: 100%;
+                                max-height: 400px;
+                                border: 1px solid #ddd;
+                                border-radius: 5px;
+                                padding: 5px;
+                            }
+                            .image-description {
+                                background: #f8fafc;
+                                padding: 15px;
+                                border-radius: 5px;
+                                margin: 15px 0;
+                                font-size: 16px;
+                            }
+                            .label {
+                                font-weight: bold;
+                                color: #1e3c72;
+                                font-size: 18px;
+                            }
+                            .footer { 
+                                margin-top: 50px; 
+                                text-align: center; 
+                                color: #2a5298; 
+                                border-top: 2px solid #2a5298;
+                                padding-top: 20px;
+                                font-size: 16px;
+                            }
+                            .date {
+                                color: #666;
+                                font-size: 16px;
+                                text-align: right;
+                                margin-top: 20px;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>Software Engineering Course - Task 2</h1>
+                        <h2>GUI Design with Images</h2>
+                        
+                        <div class="info-box">
+                            <p><span class="label">Supervisor:</span> ${data.supervisor}</p>
+                            <p><span class="label">Group Number:</span> ${data.groupNumber}</p>
+                            <p><span class="label">Student:</span> ${data.studentName} (${data.studentId})</p>
+                            <p><span class="label">Section:</span> ${data.section}</p>
+                        </div>
+                        
+                        <h3>Interface Designs</h3>
+                `;
+
+                // Process each image
+                for (let i = 0; i < data.images.length; i++) {
+                    const img = data.images[i];
+                    
+                    // Convert image to base64
+                    const base64Image = await fileToBase64(img.file);
+                    
+                    htmlContent += `
+                        <div class="image-box">
+                            <div class="figure-title">Figure ${img.number}: ${img.title}</div>
+                            <div class="image-container">
+                                <img src="${base64Image}" alt="${img.title}">
+                            </div>
+                            ${img.description ? `<div class="image-description"><span class="label">Description:</span> ${img.description}</div>` : ''}
+                        </div>
+                    `;
+                }
+
+                if (data.notes) {
+                    htmlContent += `
+                        <h3>Additional Notes</h3>
+                        <div class="image-box">
+                            <p>${data.notes}</p>
+                        </div>
+                    `;
+                }
+
+                htmlContent += `
+                        <div class="date">
+                            <p>📅 Submission Date: ${data.date}</p>
+                        </div>
+                        
+                        <div class="footer">
+                            <p>© 2026 Dr. Sherin Hijazi - All Rights Reserved</p>
+                            <p>Developed by: Dr. Sherin Hijazi - Software Engineering Course Project Management System</p>
+                        </div>
+                    </body>
+                    </html>
+                `;
+
+                // Convert HTML to Word
+                const converted = htmlDocx.asBlob(htmlContent);
+                const fileName = `Task2_Group${data.groupNumber}_${data.studentName}.docx`;
+                saveAs(converted, fileName);
+
+                showMessage('✅ Word file created successfully with images', 'success');
+            } catch (error) {
+                console.error(error);
+                showMessage('Error creating Word file: ' + error.message, 'error');
+            }
+
+            showLoading(false);
+        }
+
+        // Helper function to convert file to base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function showMessage(text, type) {
+            const msg = document.getElementById('formMessage');
+            msg.textContent = text;
+            msg.className = `message ${type}`;
+            setTimeout(() => msg.className = 'message', 3000);
+        }
+
+        function showLoading(show) {
+            const btn = document.querySelector('.btn-primary');
+            if (show) {
+                btn.innerHTML = 'Generating file... ⏳';
+                btn.disabled = true;
+            } else {
+                btn.innerHTML = '📄 Generate Word File with Images';
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 3: Requirements Gathering and Analysis</title>
+    <!-- Required libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; }
+        body { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .card { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        h1 { color: #1e3c72; text-align: center; border-bottom: 3px solid #2a5298; padding-bottom: 10px; }
+        h2 { text-align: center; color: #2a5298; margin-bottom: 20px; font-size: 28px; }
+        .info-bar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 10px; margin: 20px 0; display: flex; justify-content: space-between; font-size: 18px; }
+        .task-header { background: #2a5298; color: white; padding: 20px; border-radius: 10px; margin: 20px 0; text-align: center; }
+        .task-header h2 { color: white; font-size: 32px; margin: 0 0 10px 0; }
+        .task-header p { font-size: 20px; opacity: 0.9; }
+        .form-group { margin-bottom: 25px; }
+        label { display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 18px; }
+        input, select, textarea { 
+            width: 100%; 
+            padding: 15px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 10px; 
+            font-size: 18px; 
+            transition: all 0.3s;
+            direction: ltr;
+        }
+        textarea { min-height: 150px; resize: vertical; font-size: 18px; }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42,82,152,0.1);
+        }
+        .btn { 
+            padding: 15px 30px; 
+            border: none; 
+            border-radius: 10px; 
+            font-size: 20px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            margin: 10px 0; 
+            transition: all 0.3s; 
+            width: 100%;
+        }
+        .btn-primary { background: #2a5298; color: white; }
+        .btn-primary:hover { background: #1e3c72; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(42,82,152,0.3); }
+        .btn-success { background: #28a745; color: white; }
+        .btn-success:hover { background: #218838; transform: translateY(-2px); }
+        .message { padding: 15px; border-radius: 8px; margin: 15px 0; display: none; font-size: 18px; }
+        .message.success { background: #d4edda; color: #155724; display: block; }
+        .message.warning { background: #fff3cd; color: #856404; display: block; }
+        .deadline { 
+            background: #fff3cd; 
+            border-left: 5px solid #856404; 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin: 20px 0; 
+            font-size: 18px;
+        }
+        .footer { 
+            margin-top: 40px; 
+            padding: 20px; 
+            background: #f8f9fa; 
+            border-radius: 10px; 
+            text-align: center; 
+            color: #666; 
+            border-top: 2px solid #2a5298;
+            font-size: 16px;
+        }
+        .copyright { color: #2a5298; font-weight: bold; font-size: 18px; }
+        .supervisor-field { 
+            background: #e3f2fd; 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin-bottom: 25px; 
+            border: 2px solid #2a5298; 
+        }
+        .supervisor-field label { font-size: 20px; color: #1e3c72; }
+        .supervisor-field input { 
+            font-size: 22px; 
+            background: #f0f0f0; 
+            font-weight: bold; 
+            color: #1e3c72; 
+            border: 2px solid #2a5298;
+            direction: ltr;
+        }
+        h3 { 
+            font-size: 24px; 
+            color: #1e3c72; 
+            margin: 25px 0 15px 0; 
+            border-left: 5px solid #2a5298; 
+            padding-left: 15px; 
+        }
+        .requirement-section {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #2a5298;
+        }
+        .requirement-item {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .requirement-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .requirement-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2a5298;
+        }
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .delete-btn:hover {
+            background: #c82333;
+        }
+        .small-input {
+            margin-bottom: 10px;
+        }
+        .small-input label {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        .badge {
+            background: #2a5298;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>📊 Software Engineering - Task 3</h1>
+            
+            <div class="info-bar">
+                <span>📅 Submission: March 13 - 25, 2026</span>
+                <span>🏷️ Grade: 5 points</span>
+            </div>
+            
+            <div class="task-header">
+                <h2>Requirements Gathering and Analysis</h2>
+                <p>Project description, objectives, and detailed requirements analysis</p>
+            </div>
+            
+            <div class="deadline">
+                <strong>⏰ Important:</strong> Deadline: March 25, 2026, 11:55 PM
+                <br>📌 Submit a Word file on Moodle
+            </div>
+            
+            <div id="formMessage" class="message"></div>
+            
+            <!-- Supervisor field -->
+            <div class="supervisor-field">
+                <label>👩‍🏫 Supervisor</label>
+                <input type="text" id="supervisor" value="Dr. Sherin Hijazi" readonly>
+            </div>
+            
+            <!-- Group Information -->
+            <h3>👥 Group Information</h3>
+            
+            <div class="form-group">
+                <label>Group Number</label>
+                <input type="number" id="groupNumber" placeholder="Enter group number" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Student ID (registrar)</label>
+                <input type="text" id="studentId" placeholder="e.g., 202012345" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Student Full Name</label>
+                <input type="text" id="studentName" placeholder="Full name" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Section</label>
+                <select id="section" required>
+                    <option value="">Select section</option>
+                    <option value="1">Section 1</option>
+                    <option value="2">Section 2</option>
+                    <option value="3">Section 3</option>
+                </select>
+            </div>
+            
+            <!-- Project Description Section -->
+            <h3>📝 Project Overview</h3>
+            
+            <div class="form-group">
+                <label>Project Title</label>
+                <input type="text" id="projectTitle" placeholder="Enter project title" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Project Description</label>
+                <textarea id="projectDescription" placeholder="Provide a detailed description of the project..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Project Objectives</label>
+                <textarea id="projectObjectives" placeholder="What are the main objectives of the project?"></textarea>
+            </div>
+            
+            <!-- Functional Requirements with Description -->
+            <h3>⚙️ Functional Requirements</h3>
+            <p style="font-size: 16px; color: #666; margin-bottom: 15px;">What the system should do? Each requirement should include a brief description.</p>
+            
+            <div class="requirement-section">
+                <div id="functionalContainer"></div>
+                <button class="btn btn-success" onclick="addFunctionalRequirement()">➕ Add Functional Requirement</button>
+            </div>
+            
+            <!-- Non-Functional Requirements with Description -->
+            <h3>🛡️ Non-Functional Requirements</h3>
+            <p style="font-size: 16px; color: #666; margin-bottom: 15px;">How the system should perform? Each requirement should include a description and type.</p>
+            
+            <div class="requirement-section">
+                <div id="nonFunctionalContainer"></div>
+                <button class="btn btn-success" onclick="addNonFunctionalRequirement()">➕ Add Non-Functional Requirement</button>
+            </div>
+            
+            <!-- Word file button -->
+            <button class="btn btn-primary" onclick="generateWordFile()">📄 Generate Word File for Submission</button>
+            
+            <p style="text-align: center; margin: 20px 0; color: #666; font-size: 18px;">
+                ⭐ After clicking the button, the file will be downloaded. Upload it to Moodle.
+            </p>
+            
+            <!-- Copyright Footer -->
+            <div class="footer">
+                <p class="copyright">© 2026 Dr. Sherin Hijazi - All Rights Reserved</p>
+                <p>Developed by: Dr. Sherin Hijazi - Software Engineering Course Project Management System</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let functionalCount = 0;
+        let nonFunctionalCount = 0;
+
+        window.onload = function() {
+            // Add initial requirements
+            addFunctionalRequirement();
+            addFunctionalRequirement();
+            addNonFunctionalRequirement();
+            addNonFunctionalRequirement();
+        };
+
+        // Add Functional Requirement with Name and Description
+        function addFunctionalRequirement() {
+            functionalCount++;
+            const container = document.getElementById('functionalContainer');
+            const div = document.createElement('div');
+            div.className = 'requirement-item';
+            div.id = `functional_${functionalCount}`;
+            
+            div.innerHTML = `
+                <div class="requirement-header">
+                    <span class="requirement-title">Functional Requirement #${functionalCount}</span>
+                    <button class="delete-btn" onclick="removeRequirement('functional', ${functionalCount})">Delete</button>
+                </div>
+                <div class="small-input">
+                    <label>Requirement Name</label>
+                    <input type="text" id="functional_${functionalCount}_name" placeholder="e.g., User Authentication" style="width: 100%;">
+                </div>
+                <div class="small-input">
+                    <label>Description</label>
+                    <textarea id="functional_${functionalCount}_desc" placeholder="Describe the requirement in detail..." rows="3"></textarea>
+                </div>
+            `;
+            container.appendChild(div);
+        }
+
+        // Add Non-Functional Requirement with Name, Description and Type
+        function addNonFunctionalRequirement() {
+            nonFunctionalCount++;
+            const container = document.getElementById('nonFunctionalContainer');
+            const div = document.createElement('div');
+            div.className = 'requirement-item';
+            div.id = `nonfunctional_${nonFunctionalCount}`;
+            
+            div.innerHTML = `
+                <div class="requirement-header">
+                    <span class="requirement-title">Non-Functional Requirement #${nonFunctionalCount}</span>
+                    <button class="delete-btn" onclick="removeRequirement('nonfunctional', ${nonFunctionalCount})">Delete</button>
+                </div>
+                <div class="small-input">
+                    <label>Requirement Name</label>
+                    <input type="text" id="nonfunctional_${nonFunctionalCount}_name" placeholder="e.g., Response Time" style="width: 100%;">
+                </div>
+                <div class="small-input">
+                    <label>Description</label>
+                    <textarea id="nonfunctional_${nonFunctionalCount}_desc" placeholder="Describe the requirement in detail..." rows="3"></textarea>
+                </div>
+                <div class="small-input">
+                    <label>Requirement Type</label>
+                    <select id="nonfunctional_${nonFunctionalCount}_type" style="width: 100%; padding: 10px;">
+                        <option value="Performance">Performance</option>
+                        <option value="Security">Security</option>
+                        <option value="Usability">Usability</option>
+                        <option value="Reliability">Reliability</option>
+                        <option value="Scalability">Scalability</option>
+                        <option value="Maintainability">Maintainability</option>
+                        <option value="Portability">Portability</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            `;
+            container.appendChild(div);
+        }
+
+        function removeRequirement(type, id) {
+            const element = document.getElementById(`${type}_${id}`);
+            if (element) {
+                element.remove();
+            }
+        }
+
+        function getFormData() {
+            const groupNumber = document.getElementById('groupNumber').value;
+            const studentId = document.getElementById('studentId').value.trim();
+            const studentName = document.getElementById('studentName').value.trim();
+            const section = document.getElementById('section').value;
+            const supervisor = document.getElementById('supervisor').value;
+            const projectTitle = document.getElementById('projectTitle').value.trim();
+
+            if (!groupNumber || !studentId || !studentName || !section || !projectTitle) {
+                showMessage('Please complete all required fields', 'warning');
+                return null;
+            }
+
+            // Collect functional requirements with name and description
+            const functional = [];
+            for (let i = 1; i <= functionalCount; i++) {
+                const nameEl = document.getElementById(`functional_${i}_name`);
+                const descEl = document.getElementById(`functional_${i}_desc`);
+                
+                if (nameEl && nameEl.value.trim()) {
+                    functional.push({
+                        name: nameEl.value.trim(),
+                        description: descEl ? descEl.value.trim() : ''
+                    });
+                }
+            }
+
+            // Collect non-functional requirements with name, description and type
+            const nonFunctional = [];
+            for (let i = 1; i <= nonFunctionalCount; i++) {
+                const nameEl = document.getElementById(`nonfunctional_${i}_name`);
+                const descEl = document.getElementById(`nonfunctional_${i}_desc`);
+                const typeEl = document.getElementById(`nonfunctional_${i}_type`);
+                
+                if (nameEl && nameEl.value.trim()) {
+                    nonFunctional.push({
+                        name: nameEl.value.trim(),
+                        description: descEl ? descEl.value.trim() : '',
+                        type: typeEl ? typeEl.value : 'Other'
+                    });
+                }
+            }
+
+            if (functional.length === 0) {
+                showMessage('Add at least one functional requirement', 'warning');
+                return null;
+            }
+
+            return {
+                groupNumber,
+                studentId,
+                studentName,
+                section,
+                supervisor,
+                projectTitle,
+                projectDescription: document.getElementById('projectDescription').value.trim(),
+                projectObjectives: document.getElementById('projectObjectives').value.trim(),
+                functionalRequirements: functional,
+                nonFunctionalRequirements: nonFunctional,
+                date: new Date().toLocaleString('en-US')
+            };
+        }
+
+        // 📄 Generate Word File
+        function generateWordFile() {
+            const data = getFormData();
+            if (!data) return;
+
+            showLoading(true);
+
+            try {
+                // Create HTML content for submission
+                let htmlContent = `
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>Task 3 - Requirements Analysis Submission</title>
+                        <style>
+                            body { 
+                                font-family: 'Arial', 'Times New Roman', sans-serif; 
+                                padding: 30px; 
+                                direction: ltr;
+                                line-height: 1.8;
+                                max-width: 1000px;
+                                margin: 0 auto;
+                            }
+                            h1 { 
+                                color: #2a5298; 
+                                text-align: center; 
+                                font-size: 32px;
+                                margin-bottom: 20px;
+                                border-bottom: 3px solid #2a5298;
+                                padding-bottom: 15px;
+                            }
+                            h2 { 
+                                color: #1e3c72; 
+                                font-size: 28px;
+                                margin: 25px 0 15px 0;
+                            }
+                            h3 {
+                                color: #2a5298;
+                                font-size: 24px;
+                                margin: 20px 0 10px 0;
+                                border-left: 5px solid #2a5298;
+                                padding-left: 15px;
+                            }
+                            h4 {
+                                color: #1e3c72;
+                                font-size: 20px;
+                                margin: 15px 0 10px 0;
+                            }
+                            .info-box { 
+                                background: #f0f8ff; 
+                                padding: 20px; 
+                                border-radius: 10px; 
+                                margin: 20px 0; 
+                                border: 2px solid #2a5298;
+                                font-size: 18px;
+                            }
+                            .info-box p {
+                                margin: 10px 0;
+                                font-size: 18px;
+                            }
+                            .requirements-box { 
+                                border: 1px solid #2a5298; 
+                                padding: 20px; 
+                                margin: 15px 0; 
+                                border-radius: 10px; 
+                                background: #f8fafc;
+                            }
+                            .requirement-item {
+                                border-bottom: 1px solid #ddd;
+                                padding: 15px 0;
+                                margin: 10px 0;
+                            }
+                            .requirement-item:last-child {
+                                border-bottom: none;
+                            }
+                            .label {
+                                font-weight: bold;
+                                color: #1e3c72;
+                                font-size: 18px;
+                            }
+                            .requirement-name {
+                                color: #2a5298;
+                                font-size: 20px;
+                                font-weight: bold;
+                                margin-bottom: 5px;
+                            }
+                            .requirement-desc {
+                                color: #555;
+                                font-size: 16px;
+                                margin: 5px 0;
+                                padding-left: 20px;
+                            }
+                            .footer { 
+                                margin-top: 50px; 
+                                text-align: center; 
+                                color: #2a5298; 
+                                border-top: 2px solid #2a5298;
+                                padding-top: 20px;
+                                font-size: 16px;
+                            }
+                            .date {
+                                color: #666;
+                                font-size: 16px;
+                                text-align: right;
+                                margin-top: 20px;
+                            }
+                            .badge {
+                                background: #2a5298;
+                                color: white;
+                                padding: 5px 12px;
+                                border-radius: 20px;
+                                font-size: 14px;
+                                display: inline-block;
+                                margin-left: 10px;
+                            }
+                            .type-tag {
+                                background: #e3f2fd;
+                                color: #1e3c72;
+                                padding: 3px 10px;
+                                border-radius: 15px;
+                                font-size: 14px;
+                                display: inline-block;
+                                margin-right: 10px;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>Software Engineering Course - Task 3</h1>
+                        <h2>Requirements Gathering and Analysis</h2>
+                        
+                        <div class="info-box">
+                            <p><span class="label">Supervisor:</span> ${data.supervisor}</p>
+                            <p><span class="label">Group Number:</span> ${data.groupNumber}</p>
+                            <p><span class="label">Student:</span> ${data.studentName} (${data.studentId})</p>
+                            <p><span class="label">Section:</span> ${data.section}</p>
+                        </div>
+                        
+                        <h3>Project Overview</h3>
+                        <div class="requirements-box">
+                            <p><span class="label">Title:</span> ${data.projectTitle}</p>
+                            ${data.projectDescription ? `<p><span class="label">Description:</span> ${data.projectDescription}</p>` : ''}
+                            ${data.projectObjectives ? `<p><span class="label">Objectives:</span> ${data.projectObjectives}</p>` : ''}
+                        </div>
+                        
+                        <h3>Functional Requirements</h3>
+                        <div class="requirements-box">
+                `;
+
+                data.functionalRequirements.forEach((req, index) => {
+                    htmlContent += `
+                        <div class="requirement-item">
+                            <div class="requirement-name">
+                                FR-${index + 1}: ${req.name}
+                            </div>
+                            ${req.description ? `<div class="requirement-desc">${req.description}</div>` : ''}
+                        </div>
+                    `;
+                });
+
+                htmlContent += `
+                        </div>
+                        
+                        <h3>Non-Functional Requirements</h3>
+                        <div class="requirements-box">
+                `;
+
+                if (data.nonFunctionalRequirements.length > 0) {
+                    data.nonFunctionalRequirements.forEach((req, index) => {
+                        htmlContent += `
+                            <div class="requirement-item">
+                                <div class="requirement-name">
+                                    NFR-${index + 1}: ${req.name}
+                                    <span class="badge">${req.type}</span>
+                                </div>
+                                ${req.description ? `<div class="requirement-desc">${req.description}</div>` : ''}
+                            </div>
+                        `;
+                    });
+                } else {
+                    htmlContent += `<p>No non-functional requirements specified.</p>`;
+                }
+
+                htmlContent += `
+                        </div>
+                        
+                        <div class="date">
+                            <p>📅 Submission Date: ${data.date}</p>
+                        </div>
+                        
+                        <div class="footer">
+                            <p>© 2026 Dr. Sherin Hijazi - All Rights Reserved</p>
+                            <p>Developed by: Dr. Sherin Hijazi - Software Engineering Course Project Management System</p>
+                        </div>
+                    </body>
+                    </html>
+                `;
+
+                // Convert HTML to Word
+                const converted = htmlDocx.asBlob(htmlContent);
+                const fileName = `Task3_Group${data.groupNumber}_${data.studentName}.docx`;
+                saveAs(converted, fileName);
+
+                showMessage('✅ Word file created successfully', 'success');
+            } catch (error) {
+                console.error(error);
+                showMessage('Error creating Word file: ' + error.message, 'error');
+            }
+
+            showLoading(false);
+        }
+
+        function showMessage(text, type) {
+            const msg = document.getElementById('formMessage');
+            msg.textContent = text;
+            msg.className = `message ${type}`;
+            setTimeout(() => msg.className = 'message', 3000);
+        }
+
+        function showLoading(show) {
+            const btn = document.querySelector('.btn-primary');
+            if (show) {
+                btn.innerHTML = 'Generating file... ⏳';
+                btn.disabled = true;
+            } else {
+                btn.innerHTML = '📄 Generate Word File for Submission';
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

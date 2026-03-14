@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 8: ER-Diagram + Activity Design</title>
+    <!-- Required libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; }
+        body { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .card { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        h1 { color: #1e3c72; text-align: center; border-bottom: 3px solid #2a5298; padding-bottom: 10px; }
+        h2 { text-align: center; color: #2a5298; margin-bottom: 20px; font-size: 28px; }
+        .info-bar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 10px; margin: 20px 0; display: flex; justify-content: space-between; font-size: 18px; }
+        .task-header { background: #2a5298; color: white; padding: 20px; border-radius: 10px; margin: 20px 0; text-align: center; }
+        .task-header h2 { color: white; font-size: 32px; margin: 0 0 10px 0; }
+        .task-header p { font-size: 20px; opacity: 0.9; }
+        .form-group { margin-bottom: 25px; }
+        label { display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 18px; }
+        input, select, textarea { 
+            width: 100%; 
+            padding: 15px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 10px; 
+            font-size: 18px; 
+            transition: all 0.3s;
+            direction: ltr;
+        }
+        textarea { min-height: 100px; resize: vertical; font-size: 18px; }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42,82,152,0.1);
+        }
+        .btn { 
+            padding: 15px 30px; 
+            border: none; 
+            border-radius: 10px; 
+            font-size: 20px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            margin: 10px 0; 
+            transition: all 0.3s; 
+            width: 100%;
+        }
+        .btn-primary { background: #2a5298; color: white; }
+        .btn-primary:hover { background: #1e3c72; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(42,82,152,0.3); }
+        .btn-success { background: #28a745; color: white; }
+        .btn-success:hover { background: #218838; transform: translateY(-2px); }
+        .message { padding: 15px; border-radius: 8px; margin: 15px 0; display: none; font-size: 18px; }
+        .message.success { background: #d4edda; color: #155724; display: block; }
+        .message.warning { background: #fff3cd; color: #856404; display: block; }
+        .deadline { 
+            background: #fff3cd; 
+            border-left: 5px solid #856404; 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin: 20px 0; 
+            font-size: 18px;
+        }
+        .footer { 
+            margin-top: 40px; 
+            padding: 20px; 
+            background: #f8f9fa; 
+            border-radius: 10px; 
+            text-align: center; 
+            color: #666; 
+            border-top: 2px solid #2a5298;
+            font-size: 16px;
+        }
+        .copyright { color: #2a5298; font-weight: bold; font-size: 18px; }
+        .supervisor-field { 
+            background: #e3f2fd; 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin-bottom: 25px; 
+            border: 2px solid #2a5298; 
+        }
+        .supervisor-field label { font-size: 20px; color: #1e3c72; }
+        .supervisor-field input { 
+            font-size: 22px; 
+            background: #f0f0f0; 
+            font-weight: bold; 
+            color: #1e3c72; 
+            border: 2px solid #2a5298;
+            direction: ltr;
+        }
+        h3 { 
+            font-size: 24px; 
+            color: #1e3c72; 
+            margin: 25px 0 15px 0; 
+            border-left: 5px solid #2a5298; 
+            padding-left: 15px; 
+        }
+        .section-tabs {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .tab-btn {
+            padding: 15px 25px;
+            background: #e0e0e0;
+            border: none;
+            border-radius: 10px 10px 0 0;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            flex: 1;
+        }
+        .tab-btn.active {
+            background: #2a5298;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 2px solid #2a5298;
+            border-radius: 0 10px 10px 10px;
+            background: #f8fafc;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .entity-item, .activity-item {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .entity-header, .activity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .entity-badge, .activity-badge {
+            background: #2a5298;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .delete-btn:hover {
+            background: #c82333;
+        }
+        .attribute-item {
+            background: #f0f8ff;
+            padding: 8px;
+            margin: 5px 0 5px 20px;
+            border-radius: 5px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .relationship-item {
+            background: #fff3cd;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 5px;
+            border-left: 3px solid #856404;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+        .image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            margin: 15px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 5px;
+        }
+        .flow-step {
+            background: #e3f2fd;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+        }
+        .step-number {
+            background: #2a5298;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>📊 Software Engineering - Task 8</h1>
+            
+            <div class="info-bar">
+                <span>📅 Submission: April 17 - 26, 2026</span>
+                <span>🏷️ Grade: 5 points</span>
+            </div>
+            
+            <div class="task-header">
+                <h2>ER-Diagram + Activity Design</h2>
+                <p>Design Relational DB and Activity Diagrams</p>
+            </div>
+            
+            <div class="deadline">
+                <strong>⏰ Important:</strong> Deadline: April 26, 2026, 11:55 PM
+                <br>📌 Submit a Word file containing ER Diagram, Activity Diagrams, and database design
+            </div>
+            
+            <div id="formMessage" class="message"></div>
+            
+            <!-- Supervisor field -->
+            <div class="supervisor-field">
+                <label>👩‍🏫 Supervisor</label>
+                <input type="text" id="supervisor" value="Dr. Sherin Hijazi" readonly>
+            </div>
+            
+            <!-- Group Information -->
+            <h3>👥 Group Information</h3>
+            
+            <div class="form-group">
+                <label>Group Number</label>
+                <input type="number" id="groupNumber" placeholder="Enter group number" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Student ID (registrar)</label>
+                <input type="text" id="studentId" placeholder="e.g., 202012345" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Student Full Name</label>
+                <input type="text" id="studentName" placeholder="Full name" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Section</label>
+                <select id="section" required>
+                    <option value="">Select section</option>
+                    <option value="1">Section 1</option>
+                    <option value="2">Section 2</option>
+                    <option value="3">Section 3</option>
+                </select>
+            </div>
+            
+            <!-- Project Information -->
+            <h3>📌 Project Information</h3>
+            
+            <div class="form-group">
+                <label>Project Title</label>
+                <input type="text" id="projectTitle" placeholder="Enter project title" required>
+            </div>
+            
+            <!-- Tabs for ER and Activity -->
+            <div class="section-tabs">
+                <button class="tab-btn active" onclick="showTab('er')" id="tabErBtn">📊 ER Diagram</button>
+                <button class="tab-btn" onclick="showTab('activity')" id="tabActivityBtn">🔄 Activity Diagrams</button>
+            </div>
+            
+            <!-- ER Diagram Tab -->
+            <div id="erTab" class="tab-content active">
+                <h3>📊 Entity Relationship Diagram</h3>
+                
+                <!-- Entities Section -->
+                <h4>Entities</h4>
+                <div class="form-group">
+                    <div id="entitiesContainer"></div>
+                    <button class="btn btn-success" onclick="addEntity()">➕ Add Entity</button>
+                </div>
+                
+                <!-- Relationships Section -->
+                <h4>Relationships</h4>
+                <div class="form-group">
+                    <div id="erRelationshipsContainer"></div>
+                    <button class="btn btn-success" onclick="addERRelationship()">➕ Add Relationship</button>
+                </div>
+                
+                <!-- ER Diagram Image -->
+                <h4>ER Diagram Image</h4>
+                <div class="form-group">
+                    <label>Diagram Title</label>
+                    <input type="text" id="erDiagramTitle" value="ER Diagram">
+                </div>
+                <div class="form-group">
+                    <label>Upload ER Diagram Image</label>
+                    <input type="file" id="erDiagramFile" accept="image/*" onchange="previewImage(this, 'erPreview')">
+                </div>
+                <div id="erPreview" style="text-align: center;"></div>
+                
+                <!-- Database Schema -->
+                <h4>Database Schema</h4>
+                <div class="form-group">
+                    <label>SQL Schema / Table Definitions</label>
+                    <textarea id="sqlSchema" placeholder="CREATE TABLE users (&#10;    id INT PRIMARY KEY,&#10;    name VARCHAR(100),&#10;    email VARCHAR(100)&#10;);" rows="8"></textarea>
+                </div>
+            </div>
+            
+            <!-- Activity Diagram Tab -->
+            <div id="activityTab" class="tab-content">
+                <h3>🔄 Activity Diagrams</h3>
+                <p style="font-size: 16px; color: #666; margin-bottom: 15px;">Define activity diagrams for main system processes</p>
+                
+                <div id="activitiesContainer"></div>
+                <button class="btn btn-success" onclick="addActivity()">➕ Add Activity Diagram</button>
+            </div>
+            
+            <!-- Additional Notes (for both) -->
+            <div class="form-group">
+                <label>Additional Notes</label>
+                <textarea id="notes" placeholder="Any additional explanations about ERD or Activity Diagrams..." rows="3"></textarea>
+            </div>
+            
+            <!-- Word file button -->
+            <button class="btn btn-primary" onclick="generateWordFile()">📄 Generate Word File</button>
+            
+            <p style="text-align: center; margin: 20px 0; color: #666; font-size: 18px;">
+                ⭐ After clicking the button, the file will be downloaded. Upload it to Moodle.
+            </p>
+            
+            <!-- Copyright Footer -->
+            <div class="footer">
+                <p class="copyright">© 2026 Dr. Sherin Hijazi - All Rights Reserved</p>
+                <p>Developed by: Dr. Sherin Hijazi - Software Engineering Course Project Management System</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Counters
+        let entityCount = 0;
+        let erRelationshipCount = 0;
+        let activityCount = 0;
+
+        window.onload = function() {
+            // Add initial entities
+            addEntity();
+            addEntity();
+            
+            // Add initial relationships
+            addERRelationship();
+            
+            // Add initial activities
+            addActivity();
+            addActivity();
+        };
+
+        // Tab switching
+        function showTab(tabName) {
+            // Update tab buttons
+            document.getElementById('tabErBtn').classList.remove('active');
+            document.getElementById('tabActivityBtn').classList.remove('active');
+            
+            // Update tab content
+            document.getElementById('erTab').classList.remove('active');
+            document.getElementById('activityTab').classList.remove('active');
+            
+            if (tabName === 'er') {
+                document.getElementById('tabErBtn').classList.add('active');
+                document.getElementById('erTab').classList.add('active');
+            } else {
+                document.getElementById('tabActivityBtn').classList.add('active');
+                document.getElementById('activityTab').classList.add('active');
+            }
+        }
+
+        // Entity Functions
+        function addEntity() {
+            entityCount++;
+            const container = document.getElementById('entitiesContainer');
+            const div = document.createElement('div');
+            div.className = 'entity-item';
+            div.id = `entity_${entityCount}`;
+            
+            div.innerHTML = `
+                <div class="entity-header">
+                    <span class="entity-badge">Entity ${entityCount}</span>
+                    <button class="delete-btn" onclick="removeEntity(${entityCount})">Delete</button>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Entity Name</label>
+                        <input type="text" id="entity_${entityCount}_name" placeholder="e.g., Student, Course" value="Entity${entityCount}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Primary Key</label>
+                        <input type="text" id="entity_${entityCount}_pk" placeholder="e.g., student_id" value="id">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Attributes (one per line, format: name:type:constraint)</label>
+                    <small style="color: #666;">Example: student_id:int:PK, name:varchar(100):NOT NULL</small>
+                    <textarea id="entity_${entityCount}_attributes" placeholder="student_id:int:PK&#10;name:varchar(100):NOT NULL&#10;email:varchar(100):UNIQUE" rows="4"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="entity_${entityCount}_desc" placeholder="Describe this entity..." rows="2"></textarea>
+                </div>
+            `;
+            container.appendChild(div);
+        }
+
+        function removeEntity(id) {
+            const element = document.getElementById(`entity_${id}`);
+            if (element) {
+                element.remove();
+                renumberEntities();
+            }
+        }
+
+        function renumberEntities() {
+            const entities = document.querySelectorAll('[id^="entity_"]');
+            entityCount = entities.length;
+            
+            entities.forEach((entity, index) => {
+                const newNumber = index + 1;
+                const badge = entity.querySelector('.entity-badge');
+                badge.textContent = `Entity ${newNumber}`;
+                
+                const oldId = entity.id.split('_')[1];
+                const newId = newNumber;
+                
+                entity.id = `entity_${newId}`;
+                
+                const nameInput = entity.querySelector(`#entity_${oldId}_name`);
+                if (nameInput) nameInput.id = `entity_${newId}_name`;
+                
+                const pkInput = entity.querySelector(`#entity_${oldId}_pk`);
+                if (pkInput) pkInput.id = `entity_${newId}_pk`;
+                
+                const attrsTextarea = entity.querySelector(`#entity_${oldId}_attributes`);
+                if (attrsTextarea) attrsTextarea.id = `entity_${newId}_attributes`;
+                
+                const descTextarea = entity.querySelector(`#entity_${oldId}_desc`);
+                if (descTextarea) descTextarea.id = `entity_${newId}_desc`;
+                
+                const deleteBtn = entity.querySelector('.delete-btn');
+                if (deleteBtn) {
+                    deleteBtn.setAttribute('onclick', `removeEntity(${newNumber})`);
+                }
+            });
+        }
+
+        // ER Relationship Functions
+        function addERRelationship() {
+            erRelationshipCount++;
+            const container = document.getElementById('erRelationshipsContainer');
+            const div = document.createElement('div');
+            div.className = 'relationship-item';
+            div.id = `erRelationship_${erRelationshipCount}`;
+            
+            div.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span style="font-weight: bold; color: #2a5298;">Relationship ${erRelationshipCount}</span>
+                    <button class="delete-btn" onclick="removeERRelationship(${erRelationshipCount})" style="padding: 5px 10px;">Delete</button>
+                </div>
+                
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label>From Entity</label>
+                        <input type="text" id="erRelationship_${erRelationshipCount}_from" placeholder="Entity name" value="Entity1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Relationship Type</label>
+                        <select id="erRelationship_${erRelationshipCount}_type">
+                            <option value="One-to-One">1:1 (One-to-One)</option>
+                            <option value="One-to-Many">1:N (One-to-Many)</option>
+                            <option value="Many-to-Many">N:M (Many-to-Many)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>To Entity</label>
+                        <input type="text" id="erRelationship_${erRelationshipCount}_to" placeholder="Entity name" value="Entity2">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Description / Constraints</label>
+                    <input type="text" id="erRelationship_${erRelationshipCount}_desc" placeholder="e.g., A student enrolls in many courses">
+                </div>
+            `;
+            container.appendChild(div);
+        }
+
+        function removeERRelationship(id) {
+            const element = document.getElementById(`erRelationship_${id}`);
+            if (element) {
+                element.remove();
+                renumberERRelationships();
+            }
+        }
+
+        function renumberERRelationships() {
+            const relationships = document.querySelectorAll('[id^="erRelationship_"]');
+            erRelationshipCount = relationships.length;
+            
+            relationships.forEach((rel, index) => {
+                const newNumber = index + 1;
+                const oldId = rel.id.split('_')[1];
+                const newId = newNumber;
+                
+                rel.id = `erRelationship_${newId}`;
+                
+                const titleSpan = rel.querySelector('span[style*="font-weight: bold"]');
+                if (titleSpan) {
+                    titleSpan.textContent = `Relationship ${newNumber}`;
+                }
+                
+                const fromInput = rel.querySelector(`#erRelationship_${oldId}_from`);
+                if (fromInput) fromInput.id = `erRelationship_${newId}_from`;
+                
+                const typeSelect = rel.querySelector(`#erRelationship_${oldId}_type`);
+                if (typeSelect) typeSelect.id = `erRelationship_${newId}_type`;
+                
+                const toInput = rel.querySelector(`#erRelationship_${oldId}_to`);
+                if (toInput) toInput.id = `erRelationship_${newId}_to`;
+                
+                const descInput = rel.querySelector(`#erRelationship_${oldId}_desc`);
+                if (descInput) descInput.id = `erRelationship_${newId}_desc`;
+                
+                const deleteBtn = rel.querySelector('.delete-btn');
+                if (deleteBtn) {
+                    deleteBtn.setAttribute('onclick', `removeERRelationship(${newNumber})`);
+                }
+            });
+        }
+
+        // Activity Diagram Functions
+        function addActivity() {
+            activityCount++;
+            const container = document.getElementById('activitiesContainer');
+            const div = document.createElement('div');
+            div.className = 'activity-item';
+            div.id = `activity_${activityCount}`;
+            
+            div.innerHTML = `
+                <div class="activity-header">
+                    <span class="activity-badge">Activity ${activityCount}</span>
+                    <button class="delete-btn" onclick="removeActivity(${activityCount})">Delete</button>
+                </div>
+                
+                <div class="form-group">
+                    <label>Activity Name / Process</label>
+                    <input type="text" id="activity_${activityCount}_name" placeholder="e.g., User Registration, Book Borrowing" value="Activity ${activityCount}">
+                </div>
+                
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="activity_${activityCount}_desc" placeholder="Describe this activity..." rows="2"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Actors / Participants</label>
+                    <input type="text" id="activity_${activityCount}_actors" placeholder="e.g., User, System, Database">
+                </div>
+                
+                <div class="form-group">
+                    <label>Steps / Flow (one per line)</label>
+                    <textarea id="activity_${activityCount}_steps" placeholder="1. User enters credentials&#10;2. System validates input&#10;3. System checks database&#10;4. System returns result" rows="6"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Upload Activity Diagram Image</label>
+                    <input type="file" id="activity_${activityCount}_file" accept="image/*" onchange="previewActivityImage(this, ${activityCount})">
+                </div>
+                <div id="activity_${activityCount}_preview" style="text-align: center;"></div>
+            `;
+            container.appendChild(div);
+        }
+
+        function removeActivity(id) {
+            const element = document.getElementById(`activity_${id}`);
+            if (element) {
+                element.remove();
+                renumberActivities();
+            }
+        }
+
+        function renumberActivities() {
+            const activities = document.querySelectorAll('[id^="activity_"]');
+            activityCount = activities.length;
+            
+            activities.forEach((activity, index) => {
+                const newNumber = index + 1;
+                const badge = activity.querySelector('.activity-badge');
+                badge.textContent = `Activity ${newNumber}`;
+                
+                const oldId = activity.id.split('_')[1];
+                const newId = newNumber;
+                
+                activity.id = `activity_${newId}`;
+                
+                const nameInput = activity.querySelector(`#activity_${oldId}_name`);
+                if (nameInput) nameInput.id = `activity_${newId}_name`;
+                
+                const descTextarea = activity.querySelector(`#activity_${oldId}_desc`);
+                if (descTextarea) descTextarea.id = `activity_${newId}_desc`;
+                
+                const actorsInput = activity.querySelector(`#activity_${oldId}_actors`);
+                if (actorsInput) actorsInput.id = `activity_${newId}_actors`;
+                
+                const stepsTextarea = activity.querySelector(`#activity_${oldId}_steps`);
+                if (stepsTextarea) stepsTextarea.id = `activity_${newId}_steps`;
+                
+                const fileInput = activity.querySelector(`#activity_${oldId}_file`);
+                if (fileInput) fileInput.id = `activity_${newId}_file`;
+                
+                const previewDiv = activity.querySelector(`#activity_${oldId}_preview`);
+                if (previewDiv) previewDiv.id = `activity_${newId}_preview`;
+                
+                const deleteBtn = activity.querySelector('.delete-btn');
+                if (deleteBtn) {
+                    deleteBtn.setAttribute('onclick', `removeActivity(${newNumber})`);
+                }
+            });
+        }
+
+        // Image preview functions
+        function previewImage(input, previewId) {
+            const previewDiv = document.getElementById(previewId);
+            previewDiv.innerHTML = '';
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'image-preview';
+                    img.style.maxWidth = '100%';
+                    img.style.maxHeight = '300px';
+                    previewDiv.appendChild(img);
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function previewActivityImage(input, activityId) {
+            const previewDiv = document.getElementById(`activity_${activityId}_preview`);
+            previewDiv.innerHTML = '';
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'image-preview';
+                    img.style.maxWidth = '100%';
+                    img.style.maxHeight = '200px';
+                    previewDiv.appendChild(img);
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function getFormData() {
+            const groupNumber = document.getElementById('groupNumber').value;
+            const studentId = document.getElementById('studentId').value.trim();
+            const studentName = document.getElementById('studentName').value.trim();
+            const section = document.getElementById('section').value;
+            const supervisor = document.getElementById('supervisor').value;
+            const projectTitle = document.getElementById('projectTitle').value.trim();
+
+            if (!groupNumber || !studentId || !studentName || !section || !projectTitle) {
+                showMessage('Please complete all required fields', 'warning');
+                return null;
+            }
+
+            // Collect entities
+            const entities = [];
+            for (let i = 1; i <= entityCount; i++) {
+                const nameEl = document.getElementById(`entity_${i}_name`);
+                const pkEl = document.getElementById(`entity_${i}_pk`);
+                const attrsEl = document.getElementById(`entity_${i}_attributes`);
+                const descEl = document.getElementById(`entity_${i}_desc`);
+                
+                if (nameEl && nameEl.value.trim()) {
+                    entities.push({
+                        name: nameEl.value.trim(),
+                        primaryKey: pkEl ? pkEl.value.trim() : 'id',
+                        attributes: attrsEl ? attrsEl.value.trim() : '',
+                        description: descEl ? descEl.value.trim() : ''
+                    });
+                }
+            }
+
+            // Collect ER relationships
+            const erRelationships = [];
+            for (let i = 1; i <= erRelationshipCount; i++) {
+                const fromEl = document.getElementById(`erRelationship_${i}_from`);
+                const typeEl = document.getElementById(`erRelationship_${i}_type`);
+                const toEl = document.getElementById(`erRelationship_${i}_to`);
+                const descEl = document.getElementById(`erRelationship_${i}_desc`);
+                
+                if (fromEl && fromEl.value.trim() && toEl && toEl.value.trim()) {
+                    erRelationships.push({
+                        from: fromEl.value.trim(),
+                        type: typeEl ? typeEl.value : 'One-to-Many',
+                        to: toEl.value.trim(),
+                        description: descEl ? descEl.value.trim() : ''
+                    });
+                }
+            }
+
+            // Collect activities
+            const activities = [];
+            for (let i = 1; i <= activityCount; i++) {
+                const nameEl = document.getElementById(`activity_${i}_name`);
+                const descEl = document.getElementById(`activity_${i}_desc`);
+                const actorsEl = document.getElementById(`activity_${i}_actors`);
+                const stepsEl = document.getElementById(`activity_${i}_steps`);
+                const fileEl = document.getElementById(`activity_${i}_file`);
+                
+                if (nameEl && nameEl.value.trim()) {
+                    activities.push({
+                        name: nameEl.value.trim(),
+                        description: descEl ? descEl.value.trim() : '',
+                        actors: actorsEl ? actorsEl.value.trim() : '',
+                        steps: stepsEl ? stepsEl.value.trim() : '',
+                        file: fileEl && fileEl.files[0] ? fileEl.files[0] : null
+                    });
+                }
+            }
+
+            // Get ER diagram file
+            const erDiagramFile = document.getElementById('erDiagramFile').files[0];
+            const erDiagramTitle = document.getElementById('erDiagramTitle').value.trim() || 'ER Diagram';
+
+            // Get SQL schema
+            const sqlSchema = document.getElementById('sqlSchema').value.trim();
+
+            return {
+                groupNumber,
+                studentId,
+                studentName,
+                section,
+                supervisor,
+                projectTitle,
+                entities,
+                erRelationships,
+                erDiagramFile,
+                erDiagramTitle,
+                sqlSchema,
+                activities,
+                notes: document.getElementById('notes').value.trim(),
+                date: new Date().toLocaleString('en-US')
+            };
+        }
+
+        // 📄 Generate Word File
+        async function generateWordFile() {
+            const data = getFormData();
+            if (!data) return;
+
+            showLoading(true);
+
+            try {
+                // Create HTML content for submission
+                let htmlContent = `
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>Task 8 - ER Diagram + Activity Design</title>
+                        <style>
+                            body { 
+                                font-family: 'Arial', 'Times New Roman', sans-serif; 
+                                padding: 40px; 
+                                direction: ltr;
+                                line-height: 1.6;
+                                max-width: 1100px;
+                                margin: 0 auto;
+                            }
+                            h1 { 
+                                color: #2a5298; 
+                                text-align: center; 
+                                font-size: 28px;
+                                margin-bottom: 15px;
+                                border-bottom: 2px solid #2a5298;
+                                padding-bottom: 10px;
+                            }
+                            h2 { 
+                                color: #1e3c72; 
+                                font-size: 24px;
+                                margin: 20px 0 10px 0;
+                            }
+                            h3 {
+                                color: #2a5298;
+                                font-size: 20px;
+                                margin: 15px 0 10px 0;
+                                border-left: 4px solid #2a5298;
+                                padding-left: 10px;
+                            }
+                            h4 {
+                                color: #1e3c72;
+                                font-size: 18px;
+                                margin: 10px 0 5px 0;
+                            }
+                            .info-box { 
+                                background: #f0f8ff; 
+                                padding: 15px; 
+                                border-radius: 8px; 
+                                margin: 15px 0; 
+                                border: 1px solid #2a5298;
+                                font-size: 16px;
+                            }
+                            .info-box p {
+                                margin: 5px 0;
+                            }
+                            .section-box {
+                                border: 1px solid #2a5298;
+                                border-radius: 8px;
+                                padding: 20px;
+                                margin: 20px 0;
+                                background: #f8fafc;
+                            }
+                            .entity-box {
+                                background: white;
+                                padding: 15px;
+                                margin: 15px 0;
+                                border-radius: 8px;
+                                border: 1px solid #2a5298;
+                            }
+                            .entity-name {
+                                background: #e3f2fd;
+                                padding: 8px;
+                                margin: -15px -15px 10px -15px;
+                                border-radius: 8px 8px 0 0;
+                                border-bottom: 2px solid #2a5298;
+                                font-weight: bold;
+                                font-size: 18px;
+                                color: #2a5298;
+                            }
+                            .attribute-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin: 10px 0;
+                            }
+                            .attribute-table td {
+                                padding: 5px;
+                                border-bottom: 1px dotted #ddd;
+                            }
+                            .pk-badge {
+                                background: #2a5298;
+                                color: white;
+                                padding: 2px 6px;
+                                border-radius: 4px;
+                                font-size: 12px;
+                                margin-left: 10px;
+                            }
+                            .relationship-item {
+                                background: #fff3cd;
+                                padding: 10px;
+                                margin: 8px 0;
+                                border-radius: 5px;
+                                border-left: 4px solid #856404;
+                            }
+                            .activity-box {
+                                background: white;
+                                padding: 20px;
+                                margin: 20px 0;
+                                border-radius: 8px;
+                                border: 1px solid #2a5298;
+                                page-break-inside: avoid;
+                            }
+                            .activity-header {
+                                background: #e3f2fd;
+                                padding: 8px 12px;
+                                margin: -20px -20px 15px -20px;
+                                border-radius: 8px 8px 0 0;
+                                border-bottom: 2px solid #2a5298;
+                            }
+                            .step-item {
+                                background: #f8fafc;
+                                padding: 8px;
+                                margin: 5px 0;
+                                border-radius: 5px;
+                                border-left: 3px solid #2a5298;
+                            }
+                            .diagram-container {
+                                text-align: center;
+                                margin: 25px 0;
+                                page-break-inside: avoid;
+                            }
+                            .diagram-title {
+                                color: #2a5298;
+                                font-size: 20px;
+                                font-weight: bold;
+                                margin-bottom: 15px;
+                            }
+                            .diagram-image img {
+                                max-width: 100%;
+                                max-height: 500px;
+                                border: 2px solid #2a5298;
+                                border-radius: 5px;
+                                padding: 10px;
+                                background: white;
+                            }
+                            .sql-box {
+                                background: #f4f4f4;
+                                padding: 15px;
+                                border-radius: 5px;
+                                font-family: monospace;
+                                white-space: pre-wrap;
+                                border: 1px solid #2a5298;
+                            }
+                            .badge {
+                                background: #2a5298;
+                                color: white;
+                                padding: 3px 8px;
+                                border-radius: 4px;
+                                font-size: 14px;
+                                margin-left: 10px;
+                            }
+                            .label {
+                                font-weight: bold;
+                                color: #1e3c72;
+                            }
+                            .footer { 
+                                margin-top: 40px; 
+                                text-align: center; 
+                                color: #2a5298; 
+                                border-top: 1px solid #2a5298;
+                                padding-top: 15px;
+                                font-size: 14px;
+                            }
+                            .date {
+                                color: #666;
+                                font-size: 14px;
+                                text-align: right;
+                                margin-top: 20px;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>Software Engineering Course - Task 8</h1>
+                        <h2>ER-Diagram + Activity Design</h2>
+                        
+                        <div class="info-box">
+                            <p><span class="label">Supervisor:</span> ${data.supervisor}</p>
+                            <p><span class="label">Group Number:</span> ${data.groupNumber}</p>
+                            <p><span class="label">Student:</span> ${data.studentName} (${data.studentId})</p>
+                            <p><span class="label">Section:</span> ${data.section}</p>
+                            <p><span class="label">Project:</span> ${data.projectTitle}</p>
+                        </div>
+                        
+                        <h3>Part 1: ER Diagram</h3>
+                `;
+
+                // Entities Section
+                if (data.entities.length > 0) {
+                    htmlContent += `
+                        <div class="section-box">
+                            <h4>Entities</h4>
+                    `;
+                    
+                    data.entities.forEach(entity => {
+                        htmlContent += `
+                            <div class="entity-box">
+                                <div class="entity-name">${entity.name}</div>
+                                ${entity.description ? `<p><span class="label">Description:</span> ${entity.description}</p>` : ''}
+                                <p><span class="label">Primary Key:</span> ${entity.primaryKey || 'id'}</p>
+                        `;
+
+                        if (entity.attributes) {
+                            const attributes = entity.attributes.split('\n').filter(attr => attr.trim() !== '');
+                            if (attributes.length > 0) {
+                                htmlContent += `
+                                    <table class="attribute-table">
+                                        <tr><th>Attribute</th><th>Type</th><th>Constraints</th></tr>
+                                `;
+                                
+                                attributes.forEach(attr => {
+                                    const parts = attr.split(':');
+                                    const name = parts[0] || '';
+                                    const type = parts[1] || '';
+                                    const constraint = parts[2] || '';
+                                    htmlContent += `
+                                        <tr>
+                                            <td>${name}</td>
+                                            <td>${type}</td>
+                                            <td>${constraint}</td>
+                                        </tr>
+                                    `;
+                                });
+                                
+                                htmlContent += `</table>`;
+                            }
+                        }
+
+                        htmlContent += `</div>`;
+                    });
+                    
+                    htmlContent += `</div>`;
+                }
+
+                // ER Relationships
+                if (data.erRelationships.length > 0) {
+                    htmlContent += `
+                        <h4>Relationships</h4>
+                        <div class="section-box">
+                    `;
+                    
+                    data.erRelationships.forEach(rel => {
+                        htmlContent += `
+                            <div class="relationship-item">
+                                <strong>${rel.from}</strong> 
+                                <span style="color: #2a5298;">[${rel.type}]</span> 
+                                <strong>${rel.to}</strong>
+                                ${rel.description ? `<br><small>${rel.description}</small>` : ''}
+                            </div>
+                        `;
+                    });
+                    
+                    htmlContent += `</div>`;
+                }
+
+                // ER Diagram Image
+                if (data.erDiagramFile) {
+                    const base64Image = await fileToBase64(data.erDiagramFile);
+                    
+                    htmlContent += `
+                        <h4>ER Diagram</h4>
+                        <div class="diagram-container">
+                            <div class="diagram-title">Figure 1: ${data.erDiagramTitle}</div>
+                            <div class="diagram-image">
+                                <img src="${base64Image}" alt="ER Diagram">
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // SQL Schema
+                if (data.sqlSchema) {
+                    htmlContent += `
+                        <h4>Database Schema (SQL)</h4>
+                        <div class="sql-box">
+                            ${data.sqlSchema.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')}
+                        </div>
+                    `;
+                }
+
+                // Activities Section
+                if (data.activities.length > 0) {
+                    htmlContent += `
+                        <h3>Part 2: Activity Diagrams</h3>
+                    `;
+                    
+                    for (let i = 0; i < data.activities.length; i++) {
+                        const act = data.activities[i];
+                        
+                        htmlContent += `
+                            <div class="activity-box">
+                                <div class="activity-header">
+                                    <strong style="font-size: 18px; color: #2a5298;">Activity ${i+1}: ${act.name}</strong>
+                                </div>
+                                
+                                ${act.description ? `<p><span class="label">Description:</span> ${act.description}</p>` : ''}
+                                
+                                ${act.actors ? `<p><span class="label">Actors:</span> ${act.actors}</p>` : ''}
+                        `;
+
+                        if (act.steps) {
+                            const steps = act.steps.split('\n').filter(step => step.trim() !== '');
+                            if (steps.length > 0) {
+                                htmlContent += `<h4>Flow Steps</h4>`;
+                                
+                                steps.forEach((step, idx) => {
+                                    htmlContent += `
+                                        <div class="step-item">
+                                            <strong>Step ${idx+1}:</strong> ${step}
+                                        </div>
+                                    `;
+                                });
+                            }
+                        }
+
+                        if (act.file) {
+                            const base64Image = await fileToBase64(act.file);
+                            htmlContent += `
+                                <div class="diagram-container">
+                                    <div class="diagram-title">Figure ${i+2}: ${act.name} Diagram</div>
+                                    <div class="diagram-image">
+                                        <img src="${base64Image}" alt="Activity Diagram ${i+1}">
+                                    </div>
+                                </div>
+                            `;
+                        }
+
+                        htmlContent += `</div>`;
+                    }
+                }
+
+                // Additional Notes
+                if (data.notes) {
+                    htmlContent += `
+                        <h3>Additional Notes</h3>
+                        <div class="info-box">
+                            <p>${data.notes}</p>
+                        </div>
+                    `;
+                }
+
+                htmlContent += `
+                        <div class="date">
+                            <p>📅 Submission Date: ${data.date}</p>
+                        </div>
+                        
+                        <div class="footer">
+                            <p>© 2026 Dr. Sherin Hijazi - All Rights Reserved</p>
+                            <p>Developed by: Dr. Sherin Hijazi - Software Engineering Course Project Management System</p>
+                        </div>
+                    </body>
+                    </html>
+                `;
+
+                // Convert HTML to Word
+                const converted = htmlDocx.asBlob(htmlContent);
+                const fileName = `Task8_ER_Activity_Group${data.groupNumber}_${data.studentName}.docx`;
+                saveAs(converted, fileName);
+
+                showMessage('✅ Word file created successfully', 'success');
+            } catch (error) {
+                console.error(error);
+                showMessage('Error creating Word file: ' + error.message, 'error');
+            }
+
+            showLoading(false);
+        }
+
+        // Helper function to convert file to base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function showMessage(text, type) {
+            const msg = document.getElementById('formMessage');
+            msg.textContent = text;
+            msg.className = `message ${type}`;
+            setTimeout(() => msg.className = 'message', 3000);
+        }
+
+        function showLoading(show) {
+            const btn = document.querySelector('.btn-primary');
+            if (show) {
+                btn.innerHTML = 'Generating file... ⏳';
+                btn.disabled = true;
+            } else {
+                btn.innerHTML = '📄 Generate Word File';
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
